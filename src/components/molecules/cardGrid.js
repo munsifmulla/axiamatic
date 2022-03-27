@@ -22,6 +22,11 @@ const CardGrid = ({ products, selectedProducts, removeProduct }) => {
             </Grid>
           )
         )}
+      <p>
+        {`${
+          selectedProducts.filter(item => item.selected === true).length
+        } Products added`}
+      </p>
     </Grid>
   );
 };

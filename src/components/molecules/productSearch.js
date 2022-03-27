@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, createRef } from "react";
 import { TextField, InputAdornment, Grid, Typography } from "@material-ui/core";
 import SearchIcon from "@material-ui/icons/Search";
 import { makeStyles } from "@material-ui/styles";
@@ -27,6 +27,15 @@ const useStyles = makeStyles(_ => ({
     background: "#edf2f6",
     borderRadius: 6,
   },
+  screen: {
+    position: "fixed",
+    width: "100%",
+    height: "100vh",
+    background: "rgba(0, 0, 0, 0)",
+    right: 0,
+    left: 0,
+    zIndex: 2,
+  },
   list: {
     listStyle: "none",
     margin: 0,
@@ -35,6 +44,7 @@ const useStyles = makeStyles(_ => ({
     boxShadow: "0px 0px 5px rgba(0,0,0,0.15)",
     borderRadius: 8,
     position: "absolute",
+    zIndex: 3,
     width: "100%",
     "& li": {
       padding: "8px 10px",
@@ -61,6 +71,8 @@ const useStyles = makeStyles(_ => ({
 const ProductSearch = ({ products, selectedProducts, setProduct }) => {
   const classes = useStyles();
   const [searchedProd, setSearchedProd] = useState([]);
+  const [showList, setShowList] = useState(false);
+  const searchRef = createRef();
 
   useEffect(
     _ => {
@@ -98,7 +110,9 @@ const ProductSearch = ({ products, selectedProducts, setProduct }) => {
             placeholder="Search for any software"
             fullWidth
             onChange={e => handleSearch(e)}
+            onClick={e => setShowList(true)}
             variant="outlined"
+            inputRef={searchRef}
             InputProps={{
               startAdornment: (
                 <InputAdornment position="start">
@@ -107,12 +121,21 @@ const ProductSearch = ({ products, selectedProducts, setProduct }) => {
               ),
             }}
           />
-          {searchedProd.length > 0 && (
+          {showList && (
+            <div
+              onClick={e => setShowList(false)}
+              className={classes.screen}
+            ></div>
+          )}
+          {showList && searchedProd.length > 0 && (
             <ul className={classes.list}>
               {searchedProd.map(item => (
                 <li
                   className={item.selected === true ? "selected" : ""}
-                  onClick={() => setProduct(item.id)}
+                  onClick={() => {
+                    searchRef.current.value = "";
+                    setProduct(item.id);
+                  }}
                 >
                   <img src={`/images/${item.image}`} />
                   {item.title}
